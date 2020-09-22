@@ -45,7 +45,7 @@ async def reminder():
 #Loop this, have the tasks in a list (or use a function for lists of tasks)
 task = bot.loop.create_task(reminder())
 token = os.getenv("TOKEN")
-
+print(os.getenv('TEST'))
 loop = asyncio.get_event_loop()
 try:
     print('starting')
