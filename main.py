@@ -5,6 +5,7 @@ from discord.ext.tasks import loop
 import asyncio
 from datetime import datetime, time
 import os
+import pytz
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -32,11 +33,12 @@ async def on_command_error(ctx, error):
     print(error)
 
 async def reminder():
+    tz = pytz.timezone('Australia/Melbourne')
+
     await bot.wait_until_ready()
     me = await bot.fetch_user(102054983381311488)
     while not bot.is_closed():
-   
-        if time(22, 56, 45) <= datetime.now().time() <= time(23,00, 15):
+        if time(22, 56, 45) <= datetime.now(tz=tz).time() <= time(23,00, 15):
             await me.send("SINoALICE Collosseum!!!")
             await asyncio.sleep(86000)
 
@@ -45,7 +47,6 @@ async def reminder():
 #Loop this, have the tasks in a list (or use a function for lists of tasks)
 task = bot.loop.create_task(reminder())
 token = os.getenv("TOKEN")
-print(os.getenv('TEST'))
 loop = asyncio.get_event_loop()
 try:
     print('starting')
@@ -56,5 +57,6 @@ except KeyboardInterrupt:
     loop.run_until_complete(bot.logout())
 except Exception as e:
     print(e)
+    task.cancel()
 finally:
     loop.close()
