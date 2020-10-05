@@ -42,6 +42,7 @@ async def reminder():
             await me.send("SINoALICE Collosseum!!!")
             # await asyncio.sleep(86000)
 
+        print(time(22, 56, 45))
         print(datetime.now(tz=tz).time())
         await asyncio.sleep(30) # task runs every 60 seconds
 
