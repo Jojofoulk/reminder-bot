@@ -40,10 +40,10 @@ async def reminder():
     while not bot.is_closed():
         if time(22, 56, 45) <= datetime.now(tz=tz).time() <= time(23,00, 15):
             await me.send("SINoALICE Collosseum!!!")
-            # await asyncio.sleep(86000)
+            await asyncio.sleep(240)
 
-        print(time(22, 56, 45))
-        print(datetime.now(tz=tz).time())
+        print(f"Treshold time: {time(22, 56, 45)}")
+        print(f"Current time:{datetime.now(tz=tz).time()}")
         await asyncio.sleep(30) # task runs every 60 seconds
 
 #Loop this, have the tasks in a list (or use a function for lists of tasks)
