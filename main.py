@@ -38,7 +38,7 @@ async def reminder():
     await bot.wait_until_ready()
     me = await bot.fetch_user(102054983381311488)
     while not bot.is_closed():
-        if time(22, 56, 45) <= datetime.now(tz=tz).time() <= time(23,00, 15):
+        if time(23, 56, 45) <= datetime.now(tz=tz).time() <= time(23,59, 59):
             await me.send("SINoALICE Collosseum!!!")
             await asyncio.sleep(240)
 
