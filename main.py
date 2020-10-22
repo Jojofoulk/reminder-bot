@@ -7,6 +7,9 @@ from datetime import datetime, time
 import os
 import pytz
 from dotenv import load_dotenv
+import random
+import copy
+
 load_dotenv()
 
 bot = commands.Bot(command_prefix="!")
@@ -42,9 +45,34 @@ async def reminder():
             await me.send("SINoALICE Collosseum!!!")
             await asyncio.sleep(240)
 
-        print(f"Treshold time: {time(22, 56, 45)}")
-        print(f"Current time:{datetime.now(tz=tz).time()}")
+        # print(f"Treshold time: {time(22, 56, 45)}")
+        # print(f"Current time:{datetime.now(tz=tz).time()}")
         await asyncio.sleep(30) # task runs every 60 seconds
+
+@bot.command()
+async def colour(ctx):
+    boiz = ctx.message.raw_mentions
+    if not boiz: 
+        return
+    size = len(boiz)
+    colours = ['Brown', 'Pink', 'Blue', 'White', 'Cyan', 'Red',
+     'Purple', 'Orange', 'Yellow', 'Green', 'Black',
+     'Light Green']
+
+    random.shuffle(colours)
+    colours = colours[0:size]
+    names = copy.deepcopy(colours)
+    random.shuffle(names)
+    guild: discord.Guild = ctx.guild
+    for boi in boiz:
+        i = random.randint(0, size - 1)
+        colour = colours.pop(i)
+        name = names.pop(i)
+        size -= 1
+        member: discord.Member = await guild.fetch_member(boi)
+        await member.send(f'**Name:** `{name}` || **Colour:** `{colour}`')
+        
+
 
 #Loop this, have the tasks in a list (or use a function for lists of tasks)
 task = bot.loop.create_task(reminder())
