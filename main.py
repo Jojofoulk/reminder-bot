@@ -37,11 +37,14 @@ async def on_command_error(ctx, error):
 
 async def reminder():
     tz = pytz.timezone('Australia/Melbourne')
-
     await bot.wait_until_ready()
     me = await bot.fetch_user(102054983381311488)
     while not bot.is_closed():
-        if time(23, 56, 45) <= datetime.now(tz=tz).time() <= time(23,59, 59):
+        colo_time = os.getenv("COLO_TIME") 
+        hms = colo_time.split(',')
+        hour = int(hms[0]) or 22
+        minute = int(hms[1]) or 00
+        if time(hour, minute, 45) <= datetime.now(tz=tz).time() <= time(hour, minute + 3, 59):
             await me.send("SINoALICE Collosseum!!!")
             await asyncio.sleep(240)
 
@@ -64,6 +67,9 @@ async def colour(ctx):
     names = copy.deepcopy(colours)
     random.shuffle(names)
     guild: discord.Guild = ctx.guild
+
+    print_obj = []
+
     for boi in boiz:
         i = random.randint(0, size - 1)
         colour = colours.pop(i)
@@ -71,6 +77,7 @@ async def colour(ctx):
         size -= 1
         member: discord.Member = await guild.fetch_member(boi)
         await member.send(f'**Name:** `{name}` || **Colour:** `{colour}`')
+        print_obj.append(f"{member.username}: ")
         
 
 
