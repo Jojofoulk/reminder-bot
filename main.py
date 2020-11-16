@@ -44,7 +44,7 @@ async def reminder():
         hms = colo_time.split(',')
         hour = int(hms[0]) or 22
         minute = int(hms[1]) or 00
-        if time(hour, minute, 45) <= datetime.now(tz=tz).time() <= time(hour, minute + 3, 59):
+        if time(hour, minute, 45) <= datetime.now(tz=tz).time() <= time(hour, minute + 2, 59):
             await me.send("SINoALICE Collosseum!!!")
             await asyncio.sleep(240)
 
