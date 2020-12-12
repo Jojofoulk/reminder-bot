@@ -52,6 +52,32 @@ async def reminder():
         # print(f"Current time:{datetime.now(tz=tz).time()}")
         await asyncio.sleep(30) # task runs every 60 seconds
 
+def dm_only():
+    async def predicate(ctx):
+        if ctx.guild is not None:
+            return False
+        return True
+    return commands.check(predicate)
+
+def is_me():
+    async def predicate(ctx):
+        return ctx.author.id == os.getenv("ME")
+    return commands.check(predicate)
+
+@bot.command(aliases=["colotime"])
+@dm_only()
+async def check_time(ctx):
+    colo_time = os.getenv("COLO_TIME")
+    hour = colo_time[0:2]
+    next_hour = str(int(hour) + 1) if int(hour) < 23 else "00"
+    await ctx.send(f"{next_hour}:00 AEDT")
+
+@bot.command(aliases=["setcolotime"])
+@dm_only()
+@is_me()
+async def change_time(ctx, msg):
+    os.environ["COLO_TIME"] = msg
+
 @bot.command()
 async def colour(ctx):
     boiz = ctx.message.raw_mentions
