@@ -9,6 +9,8 @@ import pytz
 from dotenv import load_dotenv
 import random
 import copy
+from datetime import datetime, timedelta
+import pytz
 
 load_dotenv()
 
@@ -61,7 +63,7 @@ def dm_only():
 
 def is_me():
     async def predicate(ctx):
-        return ctx.author.id == os.getenv("ME")
+        return int(ctx.author.id) == int(os.getenv("ME"))
     return commands.check(predicate)
 
 @bot.command(aliases=["colotime"])
@@ -70,7 +72,15 @@ async def check_time(ctx):
     colo_time = os.getenv("COLO_TIME")
     hour = colo_time[0:2]
     next_hour = str(int(hour) + 1) if int(hour) < 23 else "00"
-    await ctx.send(f"{next_hour}:00 AEDT")
+
+    FMT = '%H:%M:%S'
+    s1 = f'{next_hour}:00:00'
+    s2 = datetime.now(pytz.timezone('Australia/Melbourne')).strftime(FMT)
+    tdelta = datetime.strptime(s1, FMT) - datetime.strptime(s2, FMT)
+    if tdelta.days < 0:
+        tdelta = timedelta(days=0, seconds=tdelta.seconds, microseconds=tdelta.microseconds)
+    
+    await ctx.send(f"Time until next colo: **{tdelta}s** \n*Planned time {next_hour}:00 AEDT*")
 
 @bot.command(aliases=["setcolotime"])
 @dm_only()
