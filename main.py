@@ -46,7 +46,14 @@ async def reminder():
         hms = colo_time.split(',')
         hour = int(hms[0]) or 22
         minute = int(hms[1]) or 00
-        if time(hour, minute, 45) <= datetime.now(tz=tz).time() <= time(hour, minute + 2, 59):
+
+        p_hour = hour
+        p_minute = minute - 3
+        if minute < 3:
+            p_minute = 60 - minute
+            p_hour = hour - 1
+
+        if time(p_hour, p_minute, 00) <= datetime.now(tz=tz).time() <= time(hour, minute, 00):
             await me.send("SINoALICE Collosseum!!!")
             await asyncio.sleep(240)
 
@@ -71,16 +78,17 @@ def is_me():
 async def check_time(ctx):
     colo_time = os.getenv("COLO_TIME")
     hour = colo_time[0:2]
-    next_hour = str(int(hour) + 1) if int(hour) < 23 else "00"
+    minutes = colo_time[3:5]
 
     FMT = '%H:%M:%S'
-    s1 = f'{next_hour}:00:00'
+    s1 = f'{hour}:{minutes}:00'
+
     s2 = datetime.now(pytz.timezone('Australia/Melbourne')).strftime(FMT)
     tdelta = datetime.strptime(s1, FMT) - datetime.strptime(s2, FMT)
     if tdelta.days < 0:
         tdelta = timedelta(days=0, seconds=tdelta.seconds, microseconds=tdelta.microseconds)
     
-    await ctx.send(f"Time until next colo: **{tdelta}s** \n*Planned time {next_hour}:00 AEDT*")
+    await ctx.send(f"Time until next colo: **{tdelta}s** \n*Planned time {s1} AEDT*")
 
 @bot.command(aliases=["setcolotime"])
 @dm_only()
