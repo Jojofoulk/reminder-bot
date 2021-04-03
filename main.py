@@ -12,6 +12,10 @@ import copy
 from datetime import datetime, timedelta
 import pytz
 
+import requests
+import html
+from bs4 import BeautifulSoup 
+
 load_dotenv()
 
 bot = commands.Bot(command_prefix="!")
@@ -19,7 +23,7 @@ bot = commands.Bot(command_prefix="!")
 @bot.event
 async def on_ready():
     print("Bot running")
-    activity = discord.Activity(name=f'Reminding you of stuff', type=discord.ActivityType.playing)
+    activity = discord.Activity(name=f'Cöck', type=discord.ActivityType.playing)
     await bot.change_presence(status = discord.Status.online, activity=activity)
 
 @bot.event
@@ -36,6 +40,38 @@ async def on_message(message):
 @bot.event
 async def on_command_error(ctx, error):
     print(error)
+
+
+@bot.command(aliases=["search", "sc", "card"])
+async def search_card(ctx, *, msg):
+    async with ctx.typing():
+
+
+        url = f"https://www.trollandtoad.com/category.php?selected-cat=7061&search-words={msg.replace(' ', '+')}"
+        resp = requests.get(url)
+        content = resp.text
+        tree = BeautifulSoup(content, features="lxml")
+
+        card_list = tree.find('div', attrs={'class': 'result-container'})
+        # Save All Cards in array.
+        # build embed based on index
+        # On msg react left/right, change index => change embed => edit msg
+        card = card_list.find('div', attrs={'class': 'product-col'})
+
+        card_name = card.find('a', attrs={'class': 'card-text'})
+
+        img_link = card.find('img')['data-src']
+
+        price=card.find('div', attrs={'class': 'text-success'}).text
+        desc = card.find('u').find('a').text
+        embed = discord.Embed(title=card_name.text, url=f"https://www.trollandtoad.com/{card_name['href']}")
+        embed.description = desc
+        embed.add_field(name="Price", value=price, inline=False)
+        embed.set_image(url=img_link)
+        await ctx.send(embed=embed)
+
+
+
 
 async def reminder():
     tz = pytz.timezone('Australia/Melbourne')
@@ -75,6 +111,7 @@ def is_me():
 
 @bot.command(aliases=["colotime"])
 @dm_only()
+@is_me()
 async def check_time(ctx):
     colo_time = os.getenv("COLO_TIME")
     hour = colo_time[0:2]
@@ -123,7 +160,6 @@ async def colour(ctx):
         await member.send(f'**Name:** `{name}` || **Colour:** `{colour}`')
         print_obj.append(f"{member.username}: ")
         
-
 
 #Loop this, have the tasks in a list (or use a function for lists of tasks)
 task = bot.loop.create_task(reminder())
