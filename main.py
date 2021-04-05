@@ -69,7 +69,9 @@ async def search_card(ctx, *, msg):
         embed.add_field(name="Price", value=price, inline=False)
         embed.set_image(url=img_link)
         await ctx.send(embed=embed)
-
+@search_card.error
+async def search_card_error(ctx, error):
+    await ctx.send('Couldn\'t retrieve card info...')
 
 
 
