@@ -51,7 +51,8 @@ async def search_card(ctx, *, msg):
             'accept': '*/*',
             'accept-encoding': 'gzip, deflate, br',
             'connection': 'kee-alive'
-            })
+            },
+            timeout=10)
         content = resp.text
         tree = BeautifulSoup(content, features="lxml")
 
