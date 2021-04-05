@@ -45,10 +45,8 @@ async def on_command_error(ctx, error):
 @bot.command(aliases=["search", "sc", "card"])
 async def search_card(ctx, *, msg):
     async with ctx.typing():
-
-
         url = f"https://www.trollandtoad.com/category.php?selected-cat=7061&search-words={msg.replace(' ', '+')}"
-        resp = requests.get(url)
+        resp = requests.get(url, headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'})
         content = resp.text
         tree = BeautifulSoup(content, features="lxml")
 
@@ -68,7 +66,9 @@ async def search_card(ctx, *, msg):
         embed.description = desc
         embed.add_field(name="Price", value=price, inline=False)
         embed.set_image(url=img_link)
+        print("Hello")
         await ctx.send(embed=embed)
+
 @search_card.error
 async def search_card_error(ctx, error):
     await ctx.send('Couldn\'t retrieve card info...')
