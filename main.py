@@ -46,7 +46,12 @@ async def on_command_error(ctx, error):
 async def search_card(ctx, *, msg):
     async with ctx.typing():
         url = f"https://www.trollandtoad.com/category.php?selected-cat=7061&search-words={msg.replace(' ', '+')}"
-        resp = requests.get(url, headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'})
+        resp = requests.get(url, headers = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'connection': 'kee-alive'
+            })
         content = resp.text
         tree = BeautifulSoup(content, features="lxml")
 
