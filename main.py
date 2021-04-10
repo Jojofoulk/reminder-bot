@@ -90,7 +90,6 @@ async def search_card(ctx, *, msg):
 async def edit_emeb_on_react(_m):
     def check(reaction, user: discord.User):
             return not user.bot and reaction.message.id in card_search_dict and reaction.message.id == _m.id and (str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⬅️')
-    print(f"ID: {_m.id}")
     try:
         reaction, user = await bot.wait_for('reaction_add', timeout=40.0, check=check)
     except asyncio.TimeoutError:
@@ -98,7 +97,6 @@ async def edit_emeb_on_react(_m):
         await _m.clear_reactions()
         # reaction.message.id  => clear from dict
     else:
-        print("reacted to a message with card info")
         _cards = card_search_dict[reaction.message.id][1]
         if str(reaction.emoji) == '➡️':
             if card_search_dict[reaction.message.id][0] == len(_cards) - 1:
@@ -145,8 +143,7 @@ def generate_embed_from_card(index, cards_list):
     embed.add_field(name="In Stock", value='✅' if in_stock else '❌', inline=True)
 
     embed.set_image(url=img_link)
-    print("Hello")
-
+    embed.set_footer(text=f"({index+1}/{len(card_list)})")
     return embed
 
 
