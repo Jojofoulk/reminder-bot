@@ -143,7 +143,7 @@ def generate_embed_from_card(index, cards_list):
     embed.add_field(name="In Stock", value='✅' if in_stock else '❌', inline=True)
 
     embed.set_image(url=img_link)
-    embed.set_footer(text=f"({index+1}/{len(card_list)})")
+    embed.set_footer(text=f"({index+1}/{len(cards_list)})")
     return embed
 
 
