@@ -111,8 +111,9 @@ async def edit_emeb_on_react(_m):
                 card_search_dict[reaction.message.id][0] -= 1
 
         e = generate_embed_from_card(card_search_dict[reaction.message.id][0], _cards)
-
         await _m.edit(embed=e)
+        await _m.remove_reaction(str(reaction.emoji), user)
+        # await for other reaction by calling this recursively
         await edit_emeb_on_react(_m)
 
 
