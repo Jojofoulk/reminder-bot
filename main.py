@@ -42,8 +42,13 @@ async def on_command_error(ctx, error):
     print(error)
 
 
+cards = []
+card_search_dict = {}
+
 @bot.command(aliases=["search", "sc", "card"])
 async def search_card(ctx, *, msg):
+    global cards
+    global card_search_dict
     async with ctx.typing():
         url = f"https://www.trollandtoad.com/category.php?selected-cat=7061&search-words={msg.replace(' ', '+')}"
         resp = requests.get(url, headers = {
@@ -53,32 +58,96 @@ async def search_card(ctx, *, msg):
             'connection': 'kee-alive'
             },
             timeout=10)
+        
+        if(resp.status_code >= 400):
+            await ctx.send(f"Failed to get a response from TrollandToad...")
+            return 
+        
         content = resp.text
+        # print(resp.headers)
         tree = BeautifulSoup(content, features="lxml")
+         
 
         card_list = tree.find('div', attrs={'class': 'result-container'})
         # Save All Cards in array.
         # build embed based on index
         # On msg react left/right, change index => change embed => edit msg
-        card = card_list.find('div', attrs={'class': 'product-col'})
+        cards = card_list.find_all('div', attrs={'class': 'product-col'})
+        # print(f"cards, {cards}")
+        embed = generate_embed_from_card(0, cards)
+        
+        m: discord.Message = await ctx.send(embed=embed)
+        card_search_dict[m.id] = [0, cards]
+        # print(f"card_search_dict, {card_search_dict}")
 
-        card_name = card.find('a', attrs={'class': 'card-text'})
+        if len(cards) > 1:
+            await m.add_reaction("⬅️")
+            await m.add_reaction("➡️")
 
-        img_link = card.find('img')['data-src']
+    await edit_emeb_on_react(m)
 
-        price=card.find('div', attrs={'class': 'text-success'}).text
-        desc = card.find('u').find('a').text
-        embed = discord.Embed(title=card_name.text, url=f"https://www.trollandtoad.com/{card_name['href']}")
-        embed.description = desc
-        embed.add_field(name="Price", value=price, inline=False)
-        embed.set_image(url=img_link)
-        print("Hello")
-        await ctx.send(embed=embed)
 
+async def edit_emeb_on_react(_m):
+    def check(reaction, user: discord.User):
+            return not user.bot and reaction.message.id in card_search_dict and reaction.message.id == _m.id and (str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⬅️')
+    print(f"ID: {_m.id}")
+    try:
+        reaction, user = await bot.wait_for('reaction_add', timeout=40.0, check=check)
+    except asyncio.TimeoutError:
+        card_search_dict.pop(_m.id , None)
+        await _m.clear_reactions()
+        # reaction.message.id  => clear from dict
+    else:
+        print("reacted to a message with card info")
+        _cards = card_search_dict[reaction.message.id][1]
+        if str(reaction.emoji) == '➡️':
+            if card_search_dict[reaction.message.id][0] == len(_cards) - 1:
+                card_search_dict[reaction.message.id][0] = 0
+            else:
+                card_search_dict[reaction.message.id][0] += 1
+
+        elif str(reaction.emoji) == '⬅️':
+            if card_search_dict[reaction.message.id][0] == 0:
+                card_search_dict[reaction.message.id][0] = len(_cards) - 1
+            else:
+                card_search_dict[reaction.message.id][0] -= 1
+
+        e = generate_embed_from_card(card_search_dict[reaction.message.id][0], _cards)
+
+        await _m.edit(embed=e)
+        await edit_emeb_on_react(_m)
+
+
+#on react: if index == len(card) - 1 go to 0 
 @search_card.error
 async def search_card_error(ctx, error):
     await ctx.send('Couldn\'t retrieve card info...')
 
+
+def generate_embed_from_card(index, cards_list):
+    card = cards_list[index]
+    card_name = card.find('a', attrs={'class': 'card-text'})
+
+    img_link = card.find('img')['data-src']
+
+
+    in_stock = True    
+    price=card.find('div', attrs={'class': 'text-success'}).text
+    if price == '$0.00':
+        price=card.find('div', attrs={'class': 'text-info'}).text
+        in_stock = False    
+
+
+    desc = card.find('u').find('a').text
+    embed = discord.Embed(title=card_name.text, url=f"https://www.trollandtoad.com/{card_name['href']}")
+    embed.description = desc
+    embed.add_field(name="Price", value=price, inline=True)
+    embed.add_field(name="In Stock", value='✅' if in_stock else '❌', inline=True)
+
+    embed.set_image(url=img_link)
+    print("Hello")
+
+    return embed
 
 
 async def reminder():
