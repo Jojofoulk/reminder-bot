@@ -47,10 +47,14 @@ card_search_dict = {}
 
 @bot.command(aliases=["search", "sc", "card"])
 async def search_card(ctx, *, msg):
+    sort_order = "Relevance"
+    if "$" in msg:
+        sort_order = "H-L"
+    msg = msg.replace("$", '')
     global cards
     global card_search_dict
     async with ctx.typing():
-        url = f"https://www.trollandtoad.com/category.php?selected-cat=7061&search-words={msg.replace(' ', '+')}"
+        url = f"https://www.trollandtoad.com/category.php?selected-cat=7061&search-words={msg.replace(' ', '+')}&sort-order={sort_order}"
         resp = requests.get(url, headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
             'accept': '*/*',
@@ -138,7 +142,7 @@ def generate_embed_from_card(index, cards_list):
 
 
     desc = card.find('u').find('a').text
-    embed = discord.Embed(title=card_name.text, url=f"https://www.trollandtoad.com/{card_name['href']}")
+    embed = discord.Embed(title=card_name.text, url=f"https://www.trollandtoad.com{card_name['href']}")
     embed.description = desc
     embed.add_field(name="Price", value=price, inline=True)
     embed.add_field(name="In Stock", value='✅' if in_stock else '❌', inline=True)
