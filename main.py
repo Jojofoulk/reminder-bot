@@ -98,7 +98,10 @@ async def edit_emeb_on_react(_m):
         reaction, user = await bot.wait_for('reaction_add', timeout=40.0, check=check)
     except asyncio.TimeoutError:
         card_search_dict.pop(_m.id , None)
-        await _m.clear_reactions()
+        try:
+            await _m.clear_reactions()
+        except:
+            print("Cheh, peut pas enlever le react")
         # reaction.message.id  => clear from dict
     else:
         _cards = card_search_dict[reaction.message.id][1]
@@ -116,7 +119,10 @@ async def edit_emeb_on_react(_m):
 
         e = generate_embed_from_card(card_search_dict[reaction.message.id][0], _cards)
         await _m.edit(embed=e)
-        await _m.remove_reaction(str(reaction.emoji), user)
+        try:
+            await _m.remove_reaction(str(reaction.emoji), user)
+        except:
+            print("Cheh, peut pas enlever le react")
         # await for other reaction by calling this recursively
         await edit_emeb_on_react(_m)
 
