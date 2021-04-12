@@ -101,7 +101,12 @@ async def edit_emeb_on_react(_m):
         try:
             await _m.clear_reactions()
         except:
-            print("Cheh, peut pas enlever le react")
+            try:
+                await _m.remove_reaction('⬅️', bot.user)
+                await _m.remove_reaction('➡️', bot.user)
+            except:
+                print("Cheh, peut pas enlever le react")
+                
         # reaction.message.id  => clear from dict
     else:
         _cards = card_search_dict[reaction.message.id][1]
