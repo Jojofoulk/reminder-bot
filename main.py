@@ -91,7 +91,7 @@ async def search_card(ctx, *, msg):
     await edit_emeb_on_react(m)
 
 
-async def edit_emeb_on_react(_m):
+async def edit_emeb_on_react(_m: discord.Message):
     def check(reaction, user: discord.User):
             return not user.bot and reaction.message.id in card_search_dict and reaction.message.id == _m.id and (str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⬅️')
     try:
@@ -99,13 +99,14 @@ async def edit_emeb_on_react(_m):
     except asyncio.TimeoutError:
         card_search_dict.pop(_m.id , None)
         try:
+            print(f"Timeout for {_m.id}: {_m.embeds[0].title}")
             await _m.clear_reactions()
         except:
             try:
                 await _m.remove_reaction('⬅️', bot.user)
                 await _m.remove_reaction('➡️', bot.user)
             except:
-                print("Cheh, peut pas enlever le react")
+                print("Can't clear reaction.")
                 
         # reaction.message.id  => clear from dict
     else:
@@ -127,7 +128,7 @@ async def edit_emeb_on_react(_m):
         try:
             await _m.remove_reaction(str(reaction.emoji), user)
         except:
-            print("Cheh, peut pas enlever le react")
+            print(f"Can't remove {user}'s reaction")
         # await for other reaction by calling this recursively
         await edit_emeb_on_react(_m)
 
