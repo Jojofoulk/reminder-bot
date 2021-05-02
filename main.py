@@ -45,7 +45,7 @@ async def on_command_error(ctx, error):
 cards = []
 card_search_dict = {}
 
-@bot.command(aliases=["search", "sc", "card"])
+@bot.command(aliases=["search", "sc", "card", "c")
 async def search_card(ctx, *, msg):
     sort_order = "Relevance"
     if "$" in msg:
@@ -96,10 +96,12 @@ async def edit_emeb_on_react(_m: discord.Message):
             return not user.bot and reaction.message.id in card_search_dict and reaction.message.id == _m.id and (str(reaction.emoji) == '➡️' or str(reaction.emoji) == '⬅️')
     try:
         reaction, user = await bot.wait_for('reaction_add', timeout=40.0, check=check)
+        # print(f"reaction: {reaction} - user: {user}")
     except asyncio.TimeoutError:
-        card_search_dict.pop(_m.id , None)
+        card_search_dict.pop(_m.id, None)
         try:
-            print(f"Timeout for {_m.id}: {_m.embeds[0].title}")
+            source = "DM" if _m.channel.type == discord.ChannelType.private else "Server"
+            print(f"Timeout for {_m.id} ({source}: {_m.channel}): {_m.embeds[0].title}")
             await _m.clear_reactions()
         except:
             try:
