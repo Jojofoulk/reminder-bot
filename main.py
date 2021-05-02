@@ -45,7 +45,7 @@ async def on_command_error(ctx, error):
 cards = []
 card_search_dict = {}
 
-@bot.command(aliases=["search", "sc", "card", "c")
+@bot.command(aliases=["search", "sc", "card", "c"])
 async def search_card(ctx, *, msg):
     sort_order = "Relevance"
     if "$" in msg:
